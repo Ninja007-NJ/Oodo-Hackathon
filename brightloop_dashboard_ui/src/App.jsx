@@ -37,7 +37,34 @@ import { Zap, X, ShieldAlert, ArrowRight } from 'lucide-react';
 export default function App() {
   const [currentRole, setCurrentRole] = useState('admin'); // 'admin' | 'staff' | 'customer'
   const [workspace, setWorkspace] = useState('operations'); // 'operations' | 'executive'
-  const [activeView, setActiveView] = useState('overview'); // Default to Executive Overview
+  const getInitialView = () => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const v = urlParams.get('view');
+      if (v) return v;
+      const hash = window.location.hash.replace('#', '');
+      if (hash) return hash;
+    } catch (e) {}
+    return 'overview';
+  };
+
+  const getInitialReceipt = () => {
+    try {
+      return new URLSearchParams(window.location.search).get('receipt') || null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const [activeView, setActiveViewRaw] = useState(getInitialView);
+  const setActiveView = (v) => {
+    setActiveViewRaw(v);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', v);
+      window.history.replaceState(null, '', url.toString());
+    } catch (e) {}
+  };
   const [activeTheme, setActiveTheme] = useState('cyan');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -50,7 +77,7 @@ export default function App() {
   const [billedPeriods, setBilledPeriods] = useState(INITIAL_BILLED_PERIODS);
   const [payments, setPayments] = useState(INITIAL_PAYMENTS);
   const [receipts, setReceipts] = useState(INITIAL_RECEIPTS);
-  const [activeReceiptId, setActiveReceiptId] = useState(null);
+  const [activeReceiptId, setActiveReceiptId] = useState(getInitialReceipt);
 
   // Filters for drill-down navigation
   const [invoiceFilter, setInvoiceFilter] = useState('all');
