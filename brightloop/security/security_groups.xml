@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Module Security Category -->
+        <record id="module_category_brightloop" model="ir.module.category">
+            <field name="name">Brightloop</field>
+            <field name="description">Subscription Management and Recurring Billing Platform</field>
+            <field name="sequence">25</field>
+        </record>
+
+        <!-- Staff Role (Internal User with operational access) -->
+        <record id="group_brightloop_user" model="res.groups">
+            <field name="name">Staff</field>
+            <field name="category_id" ref="module_category_brightloop"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Staff handles day-to-day operations: creating quotes, managing subscriptions, running billing, and recording payments.</field>
+        </record>
+
+        <!-- Admin Role (Full control) -->
+        <record id="group_brightloop_manager" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="module_category_brightloop"/>
+            <field name="implied_ids" eval="[(4, ref('group_brightloop_user')), (4, ref('base.group_system'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">Administrator controls configuration: plans, products, taxes, discounts, staff accounts, and financial overviews.</field>
+        </record>
+    </data>
+</odoo>

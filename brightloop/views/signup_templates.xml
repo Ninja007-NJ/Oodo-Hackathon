@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="signup_password_rules" inherit_id="auth_signup.fields" name="Brightloop Signup Password Rules Checklist">
+        <xpath expr="//div[hasclass('field-password')]" position="after">
+            <div id="brightloop_password_rules" class="card mt-2 p-3 bg-light border" style="font-size: 0.85rem; border-radius: 6px;">
+                <div class="fw-bold text-secondary mb-1">
+                    <i class="fa fa-shield me-1"></i> Brightloop Password Requirements:
+                </div>
+                <div id="rule_length" class="text-muted d-flex align-items-center mb-1">
+                    <span class="badge bg-secondary me-2 icon-status" style="font-size: 0.75rem; width: 18px; text-align: center;">✕</span>
+                    <span>More than 8 characters (minimum 9 characters)</span>
+                </div>
+                <div id="rule_uppercase" class="text-muted d-flex align-items-center mb-1">
+                    <span class="badge bg-secondary me-2 icon-status" style="font-size: 0.75rem; width: 18px; text-align: center;">✕</span>
+                    <span>At least one uppercase letter (A-Z)</span>
+                </div>
+                <div id="rule_lowercase" class="text-muted d-flex align-items-center mb-1">
+                    <span class="badge bg-secondary me-2 icon-status" style="font-size: 0.75rem; width: 18px; text-align: center;">✕</span>
+                    <span>At least one lowercase letter (a-z)</span>
+                </div>
+                <div id="rule_special" class="text-muted d-flex align-items-center mb-1">
+                    <span class="badge bg-secondary me-2 icon-status" style="font-size: 0.75rem; width: 18px; text-align: center;">✕</span>
+                    <span>At least one special character (!@#$%^&amp;*...)</span>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+                document.addEventListener('DOMContentLoaded', function () {
+                    const passwordInput = document.querySelector('input[name="password"]');
+                    const form = passwordInput ? passwordInput.closest('form') : null;
+
+                    const ruleLength = document.getElementById('rule_length');
+                    const ruleUpper = document.getElementById('rule_uppercase');
+                    const ruleLower = document.getElementById('rule_lowercase');
+                    const ruleSpecial = document.getElementById('rule_special');
+
+                    function updateRule(element, isValid) {
+                        if (!element) return;
+                        const icon = element.querySelector('.icon-status');
+                        if (isValid) {
+                            element.classList.remove('text-muted', 'text-danger');
+                            element.classList.add('text-success', 'fw-bold');
+                            if (icon) {
+                                icon.className = 'badge bg-success me-2 icon-status';
+                                icon.textContent = '✓';
+                            }
+                        } else {
+                            element.classList.remove('text-success', 'fw-bold');
+                            element.classList.add('text-muted');
+                            if (icon) {
+                                icon.className = 'badge bg-secondary me-2 icon-status';
+                                icon.textContent = '✕';
+                            }
+                        }
+                    }
+
+                    if (passwordInput) {
+                        passwordInput.addEventListener('input', function () {
+                            const val = passwordInput.value || '';
+                            const isLengthValid = val.length > 8; // Strictly > 8 (9 or more)
+                            const isUpperValid = /[A-Z]/.test(val);
+                            const isLowerValid = /[a-z]/.test(val);
+                            const isSpecialValid = /[^a-zA-Z0-9]/.test(val);
+
+                            updateRule(ruleLength, isLengthValid);
+                            updateRule(ruleUpper, isUpperValid);
+                            updateRule(ruleLower, isLowerValid);
+                            updateRule(ruleSpecial, isSpecialValid);
+                        });
+                    }
+
+                    if (form) {
+                        form.addEventListener('submit', function (e) {
+                            const val = passwordInput ? passwordInput.value : '';
+                            const isValid = (val.length > 8) &amp;&amp;
+                                            /[A-Z]/.test(val) &amp;&amp;
+                                            /[a-z]/.test(val) &amp;&amp;
+                                            /[^a-zA-Z0-9]/.test(val);
+                            if (!isValid) {
+                                e.preventDefault();
+                                alert('Please satisfy all password complexity rules before proceeding (more than 8 characters, with uppercase, lowercase, and a special character).');
+                            }
+                        });
+                    }
+                });
+            </script>
+        </xpath>
+    </template>
+</odoo>
