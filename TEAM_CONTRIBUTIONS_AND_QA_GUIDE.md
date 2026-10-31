@@ -8,16 +8,25 @@
 
 ## 📋 Team Role Distribution Overview
 
-| Team Member | Domain / Module | Primary Code Ownership | Live Screen Demo |
-| :--- | :--- | :--- | :--- |
-| **Lead / Member 1** | **Executive Architecture & Main Dashboard** | `App.jsx`, `ExecutiveOverviewPage.jsx`, `res_users.py` | `/?view=overview` |
-| **Member 2 (Friend 1)** | **Subscription Engine & Idempotent Recurring Billing** | `models/subscription.py`, `models/billing_engine.py`, `models/discount.py`, `BillingEngineView.jsx` | `/?view=billing` & `/?view=subscriptions` |
-| **Member 3 (Friend 2)** | **Payments, PCI Tokenization & Verified GST Receipts** | `PaymentsPage.jsx`, `ReceiptsPage.jsx`, `PaymentSecurityConsentPage.jsx` | `/?view=payments` & `/?view=receipts` |
-| **Member 4 (Friend 3)** | **AI Copilot Command Center, Risk & Productivity Intelligence** | `AICommandCenterPage.jsx`, `RiskProductivityPage.jsx`, `RecommendationsPage.jsx` | `/?view=ai` & `/?view=risk` |
+| Team Member | GitHub Profile | Domain / Module | Feature Branch & PR | Live Screen Demo |
+| :--- | :--- | :--- | :--- | :--- |
+| **Lead (Member 1)** | [`Ninja007-NJ`](https://github.com/Ninja007-NJ) | **Executive Architecture & Main Dashboard** | `main` | `/?view=overview` |
+| **Friend 1 (Member 2)** | [`salmasubair400-eng`](https://github.com/salmasubair400-eng) | **Subscription Engine & Idempotent Recurring Billing** | [`feature/billing-subscription-engine`](https://github.com/Ninja007-NJ/Oodo-Hackathon/tree/feature/billing-subscription-engine) | `/?view=billing` & `/?view=subscriptions` |
+| **Friend 2 (Member 3)** | [`Naureen-s`](https://github.com/Naureen-s) | **Payments, PCI Tokenization & Verified GST Receipts** | [`feature/payments-tokenization-receipts`](https://github.com/Ninja007-NJ/Oodo-Hackathon/tree/feature/payments-tokenization-receipts) | `/?view=payments` & `/?view=receipts` |
+| **Friend 3 (Member 4)** | Team Contributor | **AI Copilot Command Center & Risk Intelligence** | [`feature/ai-risk-productivity-copilot`](https://github.com/Ninja007-NJ/Oodo-Hackathon/tree/feature/ai-risk-productivity-copilot) | `/?view=ai` & `/?view=risk` |
 
 ---
 
-## 👤 Member 2 (Friend 1): Subscription Engine & Recurring Billing
+## 🔗 Collaborator Invitation Link
+To officially add your friends to the repository so they have full write/contributor access:
+👉 **[Invite Collaborators on GitHub](https://github.com/Ninja007-NJ/Oodo-Hackathon/settings/access)**
+1. Click **Add people**.
+2. Type **`salmasubair400-eng`** and click **Add to this repository**.
+3. Type **`Naureen-s`** and click **Add to this repository**.
+
+---
+
+## 👤 Member 2: salmasubair400-eng (Subscription Engine & Recurring Billing)
 
 ### 🛠️ What You Built & Code Ownership
 - **`brightloop/models/subscription.py`**:
