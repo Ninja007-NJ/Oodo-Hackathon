@@ -7,6 +7,8 @@ import BrightloopSidebar from './components/BrightloopSidebar';
 import ExecutiveOverviewPage from './pages/ExecutiveOverviewPage';
 import SubscriptionOperationsPage from './pages/SubscriptionOperationsPage';
 import InvoicesView from './pages/InvoicesView';
+import PaymentsPage from './pages/PaymentsPage';
+import ReceiptsPage from './pages/ReceiptsPage';
 import PaymentSecurityConsentPage from './pages/PaymentSecurityConsentPage';
 import RiskProductivityPage from './pages/RiskProductivityPage';
 import AICommandCenterPage from './pages/AICommandCenterPage';
@@ -26,6 +28,8 @@ import {
   INITIAL_SUBSCRIPTIONS,
   INITIAL_INVOICES,
   INITIAL_BILLED_PERIODS,
+  INITIAL_PAYMENTS,
+  INITIAL_RECEIPTS,
 } from './data/brightloopData';
 import { applyTheme } from './theme';
 import { Zap, X, ShieldAlert, ArrowRight } from 'lucide-react';
@@ -44,6 +48,9 @@ export default function App() {
   const [subscriptions, setSubscriptions] = useState(INITIAL_SUBSCRIPTIONS);
   const [invoices, setInvoices] = useState(INITIAL_INVOICES);
   const [billedPeriods, setBilledPeriods] = useState(INITIAL_BILLED_PERIODS);
+  const [payments, setPayments] = useState(INITIAL_PAYMENTS);
+  const [receipts, setReceipts] = useState(INITIAL_RECEIPTS);
+  const [activeReceiptId, setActiveReceiptId] = useState(null);
 
   // Filters for drill-down navigation
   const [invoiceFilter, setInvoiceFilter] = useState('all');
@@ -63,6 +70,7 @@ export default function App() {
   const overdueCount = invoices.filter(
     (i) => i.paymentState !== 'paid' && new Date(i.dueDate) < new Date('2026-10-31')
   ).length;
+  const mismatchCount = payments.filter((p) => p.status === 'mismatch').length;
 
   // Handlers
   const handleUpdateSubscription = (updated) => {
@@ -177,6 +185,14 @@ export default function App() {
           amountResidual: grandTotal,
           billingJob: true,
           discountApplied: discountName,
+          lines: sub.lines.map((l) => ({
+            id: `il_${Date.now()}_${l.id}`,
+            description: `${l.productName} (${l.variant})`,
+            qty: l.qty,
+            unitPrice: l.unitPrice,
+            taxRate: l.taxRate,
+            total: l.subtotal,
+          })),
         };
 
         newInvoices.push(invoiceRecord);
@@ -212,6 +228,14 @@ export default function App() {
   };
 
   const handleRegisterPayment = (invoiceId, paymentData) => {
+    const targetInv = invoices.find((inv) => inv.id === invoiceId);
+    if (!targetInv) return;
+
+    const receiptNum = `RCP/2026/000${receipts.length + 89}`;
+    const payNum = `PAY/2026/000${payments.length + 89}`;
+    const txnId = `TXN-${Math.floor(1000 + Math.random() * 9000)}-${paymentData.method.toUpperCase()}`;
+
+    // 1. Mark Invoice as Paid & assign receipt
     setInvoices((prev) =>
       prev.map((inv) =>
         inv.id === invoiceId
@@ -221,10 +245,156 @@ export default function App() {
               amountResidual: 0,
               paymentMethod: paymentData.method,
               paymentMemo: paymentData.memo,
+              receiptNumber: receiptNum,
             }
           : inv
       )
     );
+
+    // 2. Create Reconciled Payment Record
+    const newPayment = {
+      id: `pay_${Date.now()}`,
+      paymentNumber: payNum,
+      invoiceId: targetInv.id,
+      invoiceNumber: targetInv.number,
+      receiptNumber: receiptNum,
+      customerName: targetInv.customerName,
+      customerEmail: targetInv.customerEmail,
+      customerGst: targetInv.customerGst || '29AAACA1234F1Z9',
+      amount: targetInv.amountResidual,
+      currency: 'INR',
+      paymentDate: '2026-10-31',
+      paymentTime: '16:15:00 IST',
+      method: paymentData.method,
+      methodLabel:
+        paymentData.method === 'upi'
+          ? 'UPI / Instant QR'
+          : paymentData.method === 'card'
+          ? 'Credit Card (Tokenized •••• 4242)'
+          : paymentData.method === 'bank'
+          ? 'NEFT Bank Wire'
+          : 'Counter Cash',
+      gateway:
+        paymentData.method === 'upi'
+          ? 'Razorpay UPI Rail'
+          : paymentData.method === 'card'
+          ? 'Stripe Token Vault'
+          : 'HDFC Corporate API',
+      transactionId: txnId,
+      status: 'reconciled',
+      tokenVaultRef: `TOK_${paymentData.method}_${Math.floor(10000 + Math.random() * 90000)}`,
+      memo: paymentData.memo || 'Invoice settlement posted',
+      fees: 0,
+      notes: 'Settled and verified directly through Odoo payment registration wizard.',
+    };
+
+    setPayments((prev) => [newPayment, ...prev]);
+
+    // 3. Create Cryptographically Signed GST Receipt
+    const untaxed = targetInv.amountUntaxed || (targetInv.amountResidual / 1.18);
+    const tax18 = targetInv.amountTax || (targetInv.amountResidual - untaxed);
+    const halfTax = tax18 / 2;
+
+    const newReceipt = {
+      id: `rcp_${Date.now()}`,
+      receiptNumber: receiptNum,
+      invoiceNumber: targetInv.number,
+      paymentNumber: payNum,
+      transactionId: txnId,
+      issueDate: '2026-10-31',
+      issueTime: '16:15:00 IST',
+      customerName: targetInv.customerName,
+      customerEmail: targetInv.customerEmail,
+      customerGst: targetInv.customerGst || '29AAACA1234F1Z9',
+      billingAddress: targetInv.billingAddress || 'Corporate Office, Bengaluru, KA 560001',
+      companyName: 'Brightloop Technologies Pvt Ltd',
+      companyGst: '29AABCB1234C1Z5',
+      companyPan: 'AABCB1234C',
+      companyAddress: 'Level 4, Orion Business Tower, Bengaluru, KA 560001',
+      amountUntaxed: untaxed,
+      cgstAmount: halfTax,
+      sgstAmount: halfTax,
+      totalTax: tax18,
+      amountTotal: targetInv.amountResidual,
+      paymentMethod: `${paymentData.method.toUpperCase()} Settlement (${txnId})`,
+      tokenRef: `TOK_enc_${Math.floor(100000 + Math.random() * 900000)}`,
+      verificationHash: `SHA256: ${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+      status: 'Verified & Stamped',
+      lines: targetInv.lines || [
+        {
+          description: `Subscription Settlement (${targetInv.number})`,
+          qty: 1,
+          unitPrice: untaxed,
+          taxRate: 18,
+          total: untaxed,
+        },
+      ],
+    };
+
+    setReceipts((prev) => [newReceipt, ...prev]);
+  };
+
+  const handleResolveMismatch = (payId) => {
+    setPayments((prev) =>
+      prev.map((p) => {
+        if (p.id === payId) {
+          const receiptNum = `RCP/2026/000${receipts.length + 90}`;
+          const updated = {
+            ...p,
+            status: 'reconciled',
+            invoiceNumber: 'INV/2026/00092 (Reconciled)',
+            receiptNumber: receiptNum,
+          };
+
+          // Generate receipt for the resolved payment
+          const untaxed = p.amount / 1.18;
+          const tax = p.amount - untaxed;
+          const newRcp = {
+            id: `rcp_res_${Date.now()}`,
+            receiptNumber: receiptNum,
+            invoiceNumber: 'INV/2026/00092',
+            paymentNumber: p.paymentNumber,
+            transactionId: p.transactionId,
+            issueDate: '2026-10-31',
+            issueTime: '16:20:00 IST',
+            customerName: p.customerName,
+            customerEmail: p.customerEmail,
+            customerGst: p.customerGst || '06AABCA5544J1Z7',
+            billingAddress: 'Cyber City, Gurugram, HR 122002',
+            companyName: 'Brightloop Technologies Pvt Ltd',
+            companyGst: '29AABCB1234C1Z5',
+            companyPan: 'AABCB1234C',
+            companyAddress: 'Level 4, Orion Business Tower, Bengaluru, KA 560001',
+            amountUntaxed: untaxed,
+            cgstAmount: tax / 2,
+            sgstAmount: tax / 2,
+            totalTax: tax,
+            amountTotal: p.amount,
+            paymentMethod: `${p.methodLabel} (${p.transactionId})`,
+            tokenRef: p.tokenVaultRef,
+            verificationHash: `SHA256: ${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+            status: 'Verified & Stamped',
+            lines: [
+              {
+                description: 'Reconciled Account Balance Settlement',
+                qty: 1,
+                unitPrice: untaxed,
+                taxRate: 18,
+                total: untaxed,
+              },
+            ],
+          };
+          setReceipts((rPrev) => [newRcp, ...rPrev]);
+          return updated;
+        }
+        return p;
+      })
+    );
+  };
+
+  const handleViewReceipt = (receiptId) => {
+    setActiveReceiptId(receiptId);
+    setActiveView('receipts');
   };
 
   const handlePortalRequestChange = (subId, requestData) => {
@@ -259,6 +429,7 @@ export default function App() {
           counts={{
             activeSubs: activeSubsCount,
             overdueCount: overdueCount,
+            mismatchCount: mismatchCount,
             plansCount: plans.length,
           }}
         />
@@ -324,6 +495,25 @@ export default function App() {
                   invoices={invoices}
                   initialFilter={invoiceFilter}
                   onRegisterPayment={handleRegisterPayment}
+                  onNavigate={(view) => setActiveView(view)}
+                  onViewReceipt={handleViewReceipt}
+                />
+              )}
+
+              {activeView === 'payments' && (
+                <PaymentsPage
+                  payments={payments}
+                  onResolveMismatch={handleResolveMismatch}
+                  onViewReceipt={handleViewReceipt}
+                  onNavigate={(view) => setActiveView(view)}
+                />
+              )}
+
+              {activeView === 'receipts' && (
+                <ReceiptsPage
+                  receipts={receipts}
+                  activeReceiptId={activeReceiptId}
+                  onNavigate={(view) => setActiveView(view)}
                 />
               )}
 

@@ -3,7 +3,9 @@ import React from 'react';
 import {
   LayoutDashboard,
   Repeat,
+  FileText,
   CreditCard,
+  Receipt,
   ShieldCheck,
   AlertTriangle,
   Sparkles,
@@ -31,7 +33,9 @@ export default function BrightloopSidebar({
       items: [
         { id: 'overview', label: 'Executive Overview', icon: LayoutDashboard, badge: null, staffOnly: true },
         { id: 'subscriptions', label: 'Subscriptions', icon: Repeat, badge: counts.activeSubs || 0 },
-        { id: 'invoices', label: 'Invoices & Payments', icon: CreditCard, badge: counts.overdueCount > 0 ? `${counts.overdueCount} Overdue` : null, badgeDanger: counts.overdueCount > 0 },
+        { id: 'invoices', label: 'Customer Invoices', icon: FileText, badge: counts.overdueCount > 0 ? `${counts.overdueCount} Overdue` : null, badgeDanger: counts.overdueCount > 0 },
+        { id: 'payments', label: 'Payments & Settlement', icon: CreditCard, badge: counts.mismatchCount > 0 ? '1 Flagged' : null, badgeWarning: counts.mismatchCount > 0 },
+        { id: 'receipts', label: 'Verified Receipts', icon: Receipt, badge: 'GST' },
         { id: 'security', label: 'Security & Consent', icon: ShieldCheck, badge: 'Protected' },
         { id: 'risk', label: 'Risk & Productivity', icon: AlertTriangle, badge: '93.7%' },
       ],
@@ -119,6 +123,8 @@ export default function BrightloopSidebar({
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         item.badgeDanger
                           ? 'bg-rose-950/80 text-rose-300 border border-rose-800/80 animate-pulse'
+                          : item.badgeWarning
+                          ? 'bg-amber-950/80 text-amber-300 border border-amber-800/80'
                           : 'bg-slate-800 text-slate-300 border border-slate-700'
                       }`}
                     >
