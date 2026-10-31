@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Account Move Form Inheritance -->
+    <record id="view_brightloop_move_form_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.brightloop</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_date']" position="after">
+                <field name="subscription_id" readonly="1" invisible="not subscription_id"/>
+                <field name="billing_job" readonly="1" invisible="not billing_job"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account Move Search Inheritance -->
+    <record id="view_brightloop_account_move_filter_inherit" model="ir.ui.view">
+        <field name="name">account.move.select.brightloop</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Subscription Invoices" name="subscription_invoices"
+                        domain="[('subscription_id', '!=', False)]"/>
+                <filter string="Recurring Billing Jobs" name="billing_jobs"
+                        domain="[('billing_job', '=', True)]"/>
+                <filter string="Outstanding Invoices" name="outstanding_invoices"
+                        domain="[('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial'))]"/>
+                <filter string="Overdue Invoices" name="overdue_invoices"
+                        domain="[('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial')), ('invoice_date_due', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action for Brightloop Invoices -->
+    <record id="action_brightloop_invoices" model="ir.actions.act_window">
+        <field name="name">Subscription Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="domain">[('move_type', '=', 'out_invoice'), ('subscription_id', '!=', False)]</field>
+        <field name="context">{'default_move_type': 'out_invoice', 'search_default_subscription_invoices': 1}</field>
+    </record>
+</odoo>

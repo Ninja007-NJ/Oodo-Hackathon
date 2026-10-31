@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="website_plans_page" name="Brightloop Plans">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="py-5 bg-light text-center border-bottom">
+                    <div class="container">
+                        <span class="badge bg-primary text-uppercase px-3 py-2 mb-2" style="letter-spacing: 0.05em;">Flexible Subscriptions</span>
+                        <h1 class="display-5 fw-bold text-dark mt-2">Transparent, Scalable Plans for Modern Software</h1>
+                        <p class="lead text-muted mx-auto" style="max-width: 650px;">
+                            Choose the billing cycle and features tailored for your business. Easily upgrade, add seats, or configure variants on demand.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="py-5">
+                    <div class="container">
+                        <div class="row g-4 justify-content-center">
+                            <t t-foreach="plans" t-as="plan">
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="card h-100 shadow-sm border rounded-3 text-center d-flex flex-column justify-content-between p-4">
+                                        <div>
+                                            <h3 class="fw-bold text-dark mb-1" t-field="plan.name"/>
+                                            <div class="text-muted small text-uppercase mb-3">
+                                                Billed <span t-field="plan.billing_period"/>
+                                            </div>
+                                            <div class="display-6 fw-bold text-primary my-3">
+                                                <span t-field="plan.price" t-options='{"widget": "monetary", "display_currency": plan.currency_id}'/>
+                                                <span class="fs-6 text-muted fw-normal">/<t t-esc="plan.billing_period"/></span>
+                                            </div>
+
+                                            <div class="my-4 text-start">
+                                                <p t-if="plan.description" class="text-secondary small mb-3" t-field="plan.description"/>
+                                                <ul class="list-unstyled text-muted small">
+                                                    <li class="mb-2">
+                                                        <i class="fa fa-check text-success me-2"></i> Minimum Seats: <strong t-field="plan.min_qty"/>
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i t-attf-class="fa #{'fa-check text-success' if plan.renewable else 'fa-times text-danger'} me-2"></i>
+                                                        <span t-if="plan.renewable">Auto-Renewable</span>
+                                                        <span t-else="">Non-Renewable</span>
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i t-attf-class="fa #{'fa-check text-success' if plan.pausable else 'fa-times text-danger'} me-2"></i>
+                                                        <span t-if="plan.pausable">Pause &amp; Resume Permitted</span>
+                                                        <span t-else="">Fixed Continuous Billing</span>
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i t-attf-class="fa #{'fa-check text-success' if plan.closable else 'fa-times text-danger'} me-2"></i>
+                                                        <span t-if="plan.closable">Cancel Anytime</span>
+                                                        <span t-else="">Term Contract</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <a href="/web/signup" class="btn btn-primary w-100 py-2 fw-bold">
+                                                Get Started
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>

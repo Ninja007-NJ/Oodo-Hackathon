@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Subscriptions to Portal Home -->
+    <template id="portal_my_home_brightloop" inherit_id="portal.portal_my_home" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Subscriptions</t>
+                <t t-set="url" t-value="'/my/subscriptions'"/>
+                <t t-set="placeholder_count" t-value="'subscription_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Portal Breadcrumbs -->
+    <template id="portal_breadcrumbs_brightloop" inherit_id="portal.portal_breadcrumbs" priority="20">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'subscription' or subscription"
+                t-attf-class="breadcrumb-item #{'active' if not subscription else ''}">
+                <a t-if="subscription" t-attf-href="/my/subscriptions">Subscriptions</a>
+                <t t-else="">Subscriptions</t>
+            </li>
+            <li t-if="subscription" class="breadcrumb-item active">
+                <span t-field="subscription.number"/>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- My Subscriptions List -->
+    <template id="portal_my_subscriptions" name="My Subscriptions">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Subscriptions</t>
+            </t>
+            <t t-if="not subscriptions">
+                <p class="alert alert-warning mt-3">You do not have any active or past subscriptions yet.</p>
+            </t>
+            <div t-if="subscriptions" class="table-responsive mt-3">
+                <table class="table table-hover bg-white border">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subscription #</th>
+                            <th>Plan</th>
+                            <th>Start Date</th>
+                            <th>Next Billing</th>
+                            <th>Status</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="subscriptions" t-as="sub">
+                            <td>
+                                <a t-attf-href="/my/subscriptions/#{sub.id}">
+                                    <strong t-field="sub.number"/>
+                                </a>
+                            </td>
+                            <td><span t-field="sub.plan_id.name"/></td>
+                            <td><span t-field="sub.start_date"/></td>
+                            <td><span t-field="sub.next_billing_date"/></td>
+                            <td>
+                                <span t-if="sub.state == 'active'" class="badge bg-success">Active</span>
+                                <span t-if="sub.state == 'quotation'" class="badge bg-info">Quotation</span>
+                                <span t-if="sub.state == 'confirmed'" class="badge bg-primary">Confirmed</span>
+                                <span t-if="sub.state == 'closed'" class="badge bg-secondary">Closed</span>
+                                <span t-if="sub.state == 'draft'" class="badge bg-light text-dark">Draft</span>
+                            </td>
+                            <td class="text-end">
+                                <span t-field="sub.amount_total" t-options='{"widget": "monetary", "display_currency": sub.currency_id}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div t-if="pager" class="o_portal_pager text-center">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+
+    <!-- Subscription Detail Page -->
+    <template id="portal_subscription_page" name="Subscription Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container py-3">
+                <div t-if="request.params.get('success')" class="alert alert-success alert-dismissible fade show">
+                    Your request has been delivered to staff and is being processed.
+                </div>
+                <div t-if="request.params.get('error') == 'plan_not_closable'" class="alert alert-danger alert-dismissible fade show">
+                    This subscription plan does not permit self-service early cancellation.
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+                        <div>
+                            <h4 class="mb-0 text-dark">
+                                Subscription <span t-field="subscription.number"/>
+                            </h4>
+                            <span class="text-muted" t-field="subscription.plan_id.name"/>
+                        </div>
+                        <div>
+                            <span t-if="subscription.state == 'active'" class="badge bg-success fs-6">Active</span>
+                            <span t-if="subscription.state == 'quotation'" class="badge bg-info fs-6">Quotation</span>
+                            <span t-if="subscription.state == 'confirmed'" class="badge bg-primary fs-6">Confirmed</span>
+                            <span t-if="subscription.state == 'closed'" class="badge bg-secondary fs-6">Closed</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3 col-6">
+                                <div class="text-muted small">Billing Frequency</div>
+                                <strong t-field="subscription.plan_id.billing_period"/>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="text-muted small">Start Date</div>
+                                <strong t-field="subscription.start_date"/>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="text-muted small">Expiry Date</div>
+                                <strong t-field="subscription.expiry_date"/>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="text-muted small">Next Scheduled Billing</div>
+                                <strong t-field="subscription.next_billing_date"/>
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4 mb-3">Subscribed Products &amp; Services</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product / Add-on</th>
+                                        <th>Variant</th>
+                                        <th class="text-center">Qty</th>
+                                        <th class="text-end">Unit Price</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="subscription.line_ids" t-as="line">
+                                        <td><strong t-field="line.product_id.name"/></td>
+                                        <td><span t-field="line.variant_info"/></td>
+                                        <td class="text-center"><span t-field="line.qty"/></td>
+                                        <td class="text-end"><span t-field="line.unit_price"/></td>
+                                        <td class="text-end"><span t-field="line.amount"/></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="text-end fw-bold">Total Untaxed:</td>
+                                        <td class="text-end"><span t-field="subscription.amount_untaxed"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-end fw-bold">Taxes:</td>
+                                        <td class="text-end"><span t-field="subscription.amount_tax"/></td>
+                                    </tr>
+                                    <tr class="table-light">
+                                        <td colspan="4" class="text-end fw-bold fs-6">Grand Total:</td>
+                                        <td class="text-end fw-bold fs-6"><span t-field="subscription.amount_total"/></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- Invoices Section -->
+                        <h5 class="mt-4 mb-3">Invoices &amp; Receipts</h5>
+                        <t t-if="not subscription.invoice_ids">
+                            <p class="text-muted">No invoices generated yet.</p>
+                        </t>
+                        <div t-if="subscription.invoice_ids" class="table-responsive">
+                            <table class="table table-hover border">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Invoice #</th>
+                                        <th>Date</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Amount</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="subscription.invoice_ids" t-as="inv">
+                                        <td><strong t-field="inv.name"/></td>
+                                        <td><span t-field="inv.invoice_date"/></td>
+                                        <td><span t-field="inv.invoice_date_due"/></td>
+                                        <td>
+                                            <span t-if="inv.payment_state == 'paid'" class="badge bg-success">Paid</span>
+                                            <span t-if="inv.payment_state in ('not_paid', 'partial')" class="badge bg-warning text-dark">Unpaid</span>
+                                        </td>
+                                        <td class="text-end"><span t-field="inv.amount_total"/></td>
+                                        <td class="text-center">
+                                            <a t-attf-href="/my/invoices/#{inv.id}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-download me-1"></i> View / PDF
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Change or Cancel Request Form -->
+                        <div class="mt-5 p-4 bg-light rounded border">
+                            <h5>Manage Subscription</h5>
+                            <p class="text-muted small">Need to change your plan, add seats, or request cancellation? Submit your request directly to our support staff below.</p>
+                            <form t-attf-action="/my/subscriptions/#{subscription.id}/request_change" method="POST">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-md-3">
+                                        <select name="request_type" class="form-select">
+                                            <option value="change">Request Plan Change / Add-ons</option>
+                                            <option t-if="subscription.plan_id.closable" value="cancel">Request Cancellation</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <input type="text" name="message" class="form-control" placeholder="Describe changes needed or cancellation reason..."/>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-outline-primary w-100">Submit</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

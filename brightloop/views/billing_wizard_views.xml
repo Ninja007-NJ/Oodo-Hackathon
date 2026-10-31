@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_brightloop_billing_wizard_form" model="ir.ui.view">
+        <field name="name">brightloop.billing.wizard.form</field>
+        <field name="model">brightloop.billing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Run Recurring Billing Now">
+                <sheet>
+                    <p class="text-muted">
+                        Simulate the automated billing run as of a specific date. This evaluates all active subscriptions due on or before this date, applies discounts and taxes, generates customer invoices, and securely advances billing schedules without double-billing.
+                    </p>
+                    <group>
+                        <field name="as_of_date"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_run_billing" string="Execute Billing Run" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_brightloop_billing_wizard" model="ir.actions.act_window">
+        <field name="name">Run Billing Now</field>
+        <field name="res_model">brightloop.billing.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

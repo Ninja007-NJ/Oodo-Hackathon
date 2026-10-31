@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu -->
+    <menuitem id="menu_brightloop_root"
+              name="Brightloop"
+              web_icon="brightloop,static/description/icon.png"
+              groups="brightloop.group_brightloop_user"
+              sequence="15"/>
+
+    <!-- Operations Menu Category -->
+    <menuitem id="menu_brightloop_operations"
+              name="Operations"
+              parent="menu_brightloop_root"
+              sequence="10"/>
+
+    <menuitem id="menu_brightloop_subscription"
+              name="Subscriptions"
+              parent="menu_brightloop_operations"
+              action="action_brightloop_subscription"
+              sequence="10"/>
+
+    <menuitem id="menu_brightloop_quote_template"
+              name="Quotation Templates"
+              parent="menu_brightloop_operations"
+              action="action_brightloop_quote_template"
+              sequence="20"/>
+
+    <menuitem id="menu_brightloop_run_billing"
+              name="⚡ Run Billing Now"
+              parent="menu_brightloop_operations"
+              action="action_brightloop_billing_wizard"
+              sequence="30"/>
+
+    <!-- Invoices & Billing Category -->
+    <menuitem id="menu_brightloop_billing"
+              name="Invoices &amp; Payments"
+              parent="menu_brightloop_root"
+              sequence="20"/>
+
+    <menuitem id="menu_brightloop_invoices"
+              name="Customer Invoices"
+              parent="menu_brightloop_billing"
+              action="action_brightloop_invoices"
+              sequence="10"/>
+
+    <!-- Configuration Category -->
+    <menuitem id="menu_brightloop_configuration"
+              name="Configuration"
+              parent="menu_brightloop_root"
+              sequence="30"/>
+
+    <menuitem id="menu_brightloop_plan"
+              name="Subscription Plans"
+              parent="menu_brightloop_configuration"
+              action="action_brightloop_plan"
+              sequence="10"/>
+
+    <menuitem id="menu_brightloop_discount"
+              name="Discount Rules"
+              parent="menu_brightloop_configuration"
+              action="action_brightloop_discount"
+              sequence="20"/>
+
+    <menuitem id="menu_brightloop_product"
+              name="Products &amp; Add-ons"
+              parent="menu_brightloop_configuration"
+              action="product.product_template_action"
+              sequence="30"/>
+</odoo>

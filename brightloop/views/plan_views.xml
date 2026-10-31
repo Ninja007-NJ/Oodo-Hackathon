@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Plan Tree View -->
+    <record id="view_brightloop_plan_tree" model="ir.ui.view">
+        <field name="name">brightloop.plan.tree</field>
+        <field name="model">brightloop.plan</field>
+        <field name="arch" type="xml">
+            <tree string="Subscription Plans" decoration-muted="not active">
+                <field name="name"/>
+                <field name="billing_period"/>
+                <field name="price" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="min_qty"/>
+                <field name="auto_close"/>
+                <field name="closable"/>
+                <field name="pausable"/>
+                <field name="renewable"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Plan Form View -->
+    <record id="view_brightloop_plan_form" model="ir.ui.view">
+        <field name="name">brightloop.plan.form</field>
+        <field name="model">brightloop.plan</field>
+        <field name="arch" type="xml">
+            <form string="Subscription Plan">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="e.g. Starter Monthly, Business Yearly"/></h1>
+                    </div>
+                    <group>
+                        <group string="Pricing &amp; Frequency">
+                            <field name="billing_period"/>
+                            <label for="price"/>
+                            <div class="o_row">
+                                <field name="price" widget="monetary"/>
+                                <field name="currency_id" invisible="1"/>
+                            </div>
+                            <field name="min_qty"/>
+                        </group>
+                        <group string="Availability &amp; Lifecycle Flags">
+                            <field name="available_from"/>
+                            <field name="available_to"/>
+                            <field name="auto_close"/>
+                            <field name="closable"/>
+                            <field name="pausable"/>
+                            <field name="renewable"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Plan features, SLA, and customer entitlement details..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Plan Action -->
+    <record id="action_brightloop_plan" model="ir.actions.act_window">
+        <field name="name">Subscription Plans</field>
+        <field name="res_model">brightloop.plan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Brightloop subscription plan!
+            </p>
+        </field>
+    </record>
+</odoo>
