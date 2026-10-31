@@ -70,7 +70,7 @@ export default function BrightloopSidebar({
             onClick={() => setWorkspace('operations')}
             className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
               workspace === 'operations'
-                ? 'bg-brand text-white shadow-sm shadow-brand/30'
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -80,7 +80,7 @@ export default function BrightloopSidebar({
             onClick={() => setWorkspace('executive')}
             className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
               workspace === 'executive'
-                ? 'bg-brand text-white shadow-sm shadow-brand/30'
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >

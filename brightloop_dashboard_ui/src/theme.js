@@ -4,6 +4,7 @@
   Primary buttons use white text, so each brand colour is dark enough for readable contrast.
 */
 export const THEMES = {
+  orange: { name: 'Buildly Orange', vars: { '--glow': '249 115 22', '--brand': '249 115 22', '--brand-hi': '251 146 60', '--brand-dark': '194 65 12', '--brand-light': '255 237 213', '--tint': '254 215 170' } },
   cyan: { name: 'Neon Cyan', vars: { '--glow': '34 211 238', '--brand': '58 99 221', '--brand-hi': '70 110 227', '--brand-dark': '46 82 192', '--brand-light': '230 238 255', '--tint': '150 175 215' } },
   magenta: { name: 'Neon Magenta', vars: { '--glow': '255 79 216', '--brand': '181 32 127', '--brand-hi': '192 42 138', '--brand-dark': '153 24 107', '--brand-light': '255 232 246', '--tint': '205 150 200' } },
   lime: { name: 'Neon Lime', vars: { '--glow': '163 255 60', '--brand': '22 108 49', '--brand-hi': '29 132 57', '--brand-dark': '15 85 36', '--brand-light': '232 250 226', '--tint': '150 205 150' } },
@@ -18,8 +19,8 @@ export const PIXEL = {
 
 // People who ask their system for reduced motion start with effects off
 export const defaultSettings = () => ({
-  look: 'pixel',      // 'pixel' (robot / terminal) or 'neon' (glass and glow)
-  theme: 'cyan',      // neon colour
+  look: 'neon',       // 'pixel' (robot / terminal) or 'neon' (glass and glow)
+  theme: 'orange',    // neon colour: Buildly Orange
   pixel: 'orange',    // pixel colour
   intensity: 100,
   effects: !(typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),

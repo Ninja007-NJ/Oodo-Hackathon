@@ -20,6 +20,7 @@ import SettingsSecurityPage from './pages/SettingsSecurityPage';
 import BillingEngineView from './pages/BillingEngineView';
 import SignupVerificationView from './pages/SignupVerificationView';
 import CustomerPortalView from './pages/CustomerPortalView';
+import LoginPage, { DEMO_PROFILES } from './pages/LoginPage';
 
 import {
   INITIAL_PLANS,
@@ -35,6 +36,8 @@ import { applyTheme } from './theme';
 import { Zap, X, ShieldAlert, ArrowRight } from 'lucide-react';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(DEMO_PROFILES[0]);
   const [currentRole, setCurrentRole] = useState('admin'); // 'admin' | 'staff' | 'customer'
   const [workspace, setWorkspace] = useState('operations'); // 'operations' | 'executive'
   const getInitialView = () => {
@@ -65,8 +68,24 @@ export default function App() {
       window.history.replaceState(null, '', url.toString());
     } catch (e) {}
   };
-  const [activeTheme, setActiveTheme] = useState('cyan');
+  const [activeTheme, setActiveTheme] = useState('orange');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleLogin = (profile) => {
+    setCurrentUser(profile);
+    setCurrentRole(profile.role);
+    setIsAuthenticated(true);
+    if (profile.role === 'customer') {
+      setActiveView('subscriptions');
+    } else {
+      setActiveView(profile.initialView || 'overview');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setActiveView('overview');
+  };
 
   // Data Store State
   const [plans, setPlans] = useState(INITIAL_PLANS);
@@ -428,15 +447,22 @@ export default function App() {
     console.log('Customer request delivered to support queue:', subId, requestData);
   };
 
+  // If user is not authenticated or navigated to login, render the LoginPage
+  if (!isAuthenticated || activeView === 'login') {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
   // Group Check: If current role is customer and accessing overview, show server refusal
   const isCustomerOnOverview = currentRole === 'customer' && activeView === 'overview';
 
   return (
-    <div className="min-h-screen bg-[#0A0F1A] text-slate-100 flex flex-col font-sans selection:bg-brand selection:text-white">
+    <div className="min-h-screen bg-[#0A0D14] text-slate-100 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
       {/* Top Header Navigation */}
       <BrightloopHeader
         currentRole={currentRole}
         setCurrentRole={setCurrentRole}
+        currentUser={currentUser}
+        onLogout={handleLogout}
         onOpenBillingModal={() => setBillingModalOpen(true)}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
