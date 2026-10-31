@@ -1,19 +1,18 @@
-// BrightloopSidebar.jsx
+// BrightloopSidebar.jsx - Exact Navigation Hierarchy matching ASCII Art and 9-Set Dashboard
 import React from 'react';
 import {
   LayoutDashboard,
   Repeat,
-  FileText,
-  Zap,
   CreditCard,
-  Package,
-  Percent,
-  UserCheck,
-  ShieldAlert,
   ShieldCheck,
+  AlertTriangle,
   Sparkles,
-  ChevronRight,
-  UserPlus
+  Lightbulb,
+  BarChart3,
+  Settings,
+  Zap,
+  UserPlus,
+  ShieldAlert
 } from 'lucide-react';
 
 export default function BrightloopSidebar({
@@ -26,29 +25,31 @@ export default function BrightloopSidebar({
 }) {
   const isCustomer = currentRole === 'customer';
 
-  const navItems = [
+  const navSections = [
     {
-      group: 'Core Operations',
+      title: 'Main Intelligence',
       items: [
-        { id: 'dashboard', label: 'Executive Dashboard', icon: LayoutDashboard, badge: null, staffOnly: true },
+        { id: 'overview', label: 'Executive Overview', icon: LayoutDashboard, badge: null, staffOnly: true },
         { id: 'subscriptions', label: 'Subscriptions', icon: Repeat, badge: counts.activeSubs || 0 },
-        { id: 'templates', label: 'Quotation Templates', icon: FileText, badge: null },
-        { id: 'billing', label: '⚡ Run Billing Engine', icon: Zap, badge: 'Daily Cron' },
         { id: 'invoices', label: 'Invoices & Payments', icon: CreditCard, badge: counts.overdueCount > 0 ? `${counts.overdueCount} Overdue` : null, badgeDanger: counts.overdueCount > 0 },
+        { id: 'security', label: 'Security & Consent', icon: ShieldCheck, badge: 'Protected' },
+        { id: 'risk', label: 'Risk & Productivity', icon: AlertTriangle, badge: '93.7%' },
       ],
     },
     {
-      group: 'Catalog & Config (Admin)',
+      title: 'AI & Insights',
       items: [
-        { id: 'plans', label: 'Subscription Plans', icon: Package, badge: counts.plansCount || 4 },
-        { id: 'discounts', label: 'Discounts & Taxes', icon: Percent, badge: 'GST 18%' },
+        { id: 'ai', label: 'AI Assistant', icon: Sparkles, badge: 'Copilot' },
+        { id: 'recommendations', label: 'Recommendations', icon: Lightbulb, badge: '3 Actions' },
+        { id: 'reports', label: 'Reports & Analytics', icon: BarChart3, badge: null },
       ],
     },
     {
-      group: 'Public & Portal Experience',
+      title: 'Platform & Controls',
       items: [
-        { id: 'portal', label: 'Customer Portal', icon: UserCheck, badge: 'Self-Service' },
-        { id: 'signup', label: 'Website Sign-Up Policy', icon: UserPlus, badge: '9+ Chars' },
+        { id: 'settings', label: 'Settings & Security', icon: Settings, badge: null },
+        { id: 'billing', label: '⚡ Run Billing Engine', icon: Zap, badge: 'Idempotent' },
+        { id: 'signup', label: 'Sign-Up Policy Test', icon: UserPlus, badge: '9+ Chars' },
       ],
     },
   ];
@@ -69,7 +70,7 @@ export default function BrightloopSidebar({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <span>Ops Desk</span>
+            <span>Operations</span>
           </button>
           <button
             onClick={() => setWorkspace('executive')}
@@ -84,14 +85,14 @@ export default function BrightloopSidebar({
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-5">
-        {navItems.map((group, gIdx) => (
-          <div key={gIdx} className="space-y-1">
+      {/* Nav List */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        {navSections.map((sec, sIdx) => (
+          <div key={sIdx} className="space-y-1">
             <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-2.5 py-1">
-              {group.group}
+              {sec.title}
             </div>
-            {group.items.map((item) => {
+            {sec.items.map((item) => {
               const Icon = item.icon;
               const isActive = activeView === item.id;
               const isRestrictedForCustomer = isCustomer && item.staffOnly;
@@ -136,12 +137,12 @@ export default function BrightloopSidebar({
         <div className="flex items-center justify-between text-slate-400">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>RBAC Server Guard</span>
+            <span>RBAC Guard Status</span>
           </span>
-          <span className="text-emerald-400 font-bold">Enforced</span>
+          <span className="text-emerald-400 font-bold">{currentRole.toUpperCase()}</span>
         </div>
         <div className="text-[10px] text-slate-400">
-          Odoo [17] Compatible ORM Engine
+          Odoo [17] Custom Modules Sync
         </div>
       </div>
     </aside>

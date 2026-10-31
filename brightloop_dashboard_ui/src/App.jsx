@@ -2,13 +2,23 @@
 import React, { useState, useEffect } from 'react';
 import BrightloopHeader from './components/BrightloopHeader';
 import BrightloopSidebar from './components/BrightloopSidebar';
-import BrightloopDashboard from './pages/BrightloopDashboard';
-import SubscriptionsView from './pages/SubscriptionsView';
+
+// 9 Core Dashboard Pages + Utilities
+import ExecutiveOverviewPage from './pages/ExecutiveOverviewPage';
+import SubscriptionOperationsPage from './pages/SubscriptionOperationsPage';
 import InvoicesView from './pages/InvoicesView';
+import PaymentSecurityConsentPage from './pages/PaymentSecurityConsentPage';
+import RiskProductivityPage from './pages/RiskProductivityPage';
+import AICommandCenterPage from './pages/AICommandCenterPage';
+import RecommendationsPage from './pages/RecommendationsPage';
+import ReportsAnalyticsPage from './pages/ReportsAnalyticsPage';
+import SettingsSecurityPage from './pages/SettingsSecurityPage';
+
+// Operations & Verification Utilities
 import BillingEngineView from './pages/BillingEngineView';
-import PlansCatalogView from './pages/PlansCatalogView';
-import CustomerPortalView from './pages/CustomerPortalView';
 import SignupVerificationView from './pages/SignupVerificationView';
+import CustomerPortalView from './pages/CustomerPortalView';
+
 import {
   INITIAL_PLANS,
   INITIAL_PRODUCTS,
@@ -18,12 +28,12 @@ import {
   INITIAL_BILLED_PERIODS,
 } from './data/brightloopData';
 import { applyTheme } from './theme';
-import { Zap, X } from 'lucide-react';
+import { Zap, X, ShieldAlert, ArrowRight } from 'lucide-react';
 
 export default function App() {
   const [currentRole, setCurrentRole] = useState('admin'); // 'admin' | 'staff' | 'customer'
   const [workspace, setWorkspace] = useState('operations'); // 'operations' | 'executive'
-  const [activeView, setActiveView] = useState('dashboard');
+  const [activeView, setActiveView] = useState('overview'); // Default to Executive Overview
   const [activeTheme, setActiveTheme] = useState('cyan');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -48,10 +58,11 @@ export default function App() {
     applyTheme({ theme: activeTheme });
   }, [activeTheme]);
 
-  // If role switches to customer while on dashboard, auto-keep or let guard display
   // Counts for sidebar badges
   const activeSubsCount = subscriptions.filter((s) => s.state === 'active').length;
-  const overdueCount = invoices.filter((i) => i.paymentState !== 'paid' && new Date(i.dueDate) < new Date('2026-10-31')).length;
+  const overdueCount = invoices.filter(
+    (i) => i.paymentState !== 'paid' && new Date(i.dueDate) < new Date('2026-10-31')
+  ).length;
 
   // Handlers
   const handleUpdateSubscription = (updated) => {
@@ -216,18 +227,16 @@ export default function App() {
     );
   };
 
-  const handleAddPlan = (newPlan) => {
-    setPlans((prev) => [newPlan, ...prev]);
+  const handlePortalRequestChange = (subId, requestData) => {
+    console.log('Customer request delivered to support queue:', subId, requestData);
   };
 
-  const handlePortalRequestChange = (subId, requestData) => {
-    // Posted to chatter simulation
-    console.log('Customer request received:', subId, requestData);
-  };
+  // Group Check: If current role is customer and accessing overview, show server refusal
+  const isCustomerOnOverview = currentRole === 'customer' && activeView === 'overview';
 
   return (
     <div className="min-h-screen bg-[#0A0F1A] text-slate-100 flex flex-col font-sans selection:bg-brand selection:text-white">
-      {/* Top Application Header */}
+      {/* Top Header Navigation */}
       <BrightloopHeader
         currentRole={currentRole}
         setCurrentRole={setCurrentRole}
@@ -239,7 +248,7 @@ export default function App() {
         setActiveTheme={setActiveTheme}
       />
 
-      {/* Main Body Area: Sidebar + Active Screen */}
+      {/* Main Layout: Sidebar + Active Screen */}
       <div className="flex-1 flex flex-col md:flex-row">
         <BrightloopSidebar
           activeView={activeView}
@@ -254,89 +263,114 @@ export default function App() {
           }}
         />
 
-        <div className="flex-1 overflow-y-auto bg-slate-950/60 pb-12">
-          {activeView === 'dashboard' && (
-            <BrightloopDashboard
-              currentRole={currentRole}
-              subscriptions={subscriptions}
-              invoices={invoices}
-              loadTimeMs={38}
-              onNavigate={(view) => setActiveView(view)}
-              onFilterInvoices={(filter) => {
-                setInvoiceFilter(filter);
-                setActiveView('invoices');
-              }}
-              onFilterSubscriptions={(filter) => {
-                setSubFilter(filter);
-                setActiveView('subscriptions');
-              }}
-            />
-          )}
+        <div className="flex-1 overflow-y-auto bg-slate-950/60 pb-16">
+          {/* Server Guard Refusal Card if Customer navigates to Executive Overview */}
+          {isCustomerOnOverview ? (
+            <main className="max-w-4xl mx-auto p-6 sm:p-12 space-y-6">
+              <div className="rounded-3xl border-2 border-rose-500/50 bg-slate-900/90 backdrop-blur-xl p-8 shadow-2xl text-center space-y-5">
+                <div className="w-16 h-16 rounded-2xl bg-rose-950/80 border border-rose-800 text-rose-400 mx-auto flex items-center justify-center">
+                  <ShieldAlert className="w-8 h-8" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400 bg-rose-950/60 px-3 py-1 rounded-full border border-rose-800/60">
+                    Server-Side Group Check • HTTP 403 Forbidden
+                  </span>
+                  <h2 className="text-2xl font-black text-white mt-3">Access Refused: Staff &amp; Admin Only</h2>
+                  <p className="text-sm text-slate-400 max-w-lg mx-auto mt-2 leading-relaxed">
+                    The executive overview endpoint strictly raises an Access Error for portal users. Group check confirmed you are signed in as a portal customer.
+                  </p>
+                </div>
+                <div className="pt-2 flex justify-center">
+                  <button
+                    onClick={() => setActiveView('subscriptions')}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black font-bold text-xs shadow-lg hover:bg-neutral-200 transition-all cursor-pointer"
+                  >
+                    <span>View Self-Service Portal Instead</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </main>
+          ) : (
+            <>
+              {activeView === 'overview' && (
+                <ExecutiveOverviewPage
+                  subscriptions={subscriptions}
+                  invoices={invoices}
+                  loadTimeMs={38}
+                  onNavigate={(view) => setActiveView(view)}
+                  onFilterInvoices={(filter) => {
+                    setInvoiceFilter(filter);
+                    setActiveView('invoices');
+                  }}
+                  onFilterSubscriptions={(filter) => {
+                    setSubFilter(filter);
+                    setActiveView('subscriptions');
+                  }}
+                />
+              )}
 
-          {activeView === 'subscriptions' && (
-            <SubscriptionsView
-              subscriptions={subscriptions}
-              initialFilter={subFilter}
-              currentRole={currentRole}
-              onUpdateSubscription={handleUpdateSubscription}
-              onCreateFromTemplate={handleCreateFromTemplate}
-            />
-          )}
+              {activeView === 'subscriptions' && (
+                <SubscriptionOperationsPage
+                  subscriptions={subscriptions}
+                  onUpdateSubscription={handleUpdateSubscription}
+                  onCreateFromTemplate={handleCreateFromTemplate}
+                  onNavigate={(view) => setActiveView(view)}
+                />
+              )}
 
-          {activeView === 'templates' && (
-            <SubscriptionsView
-              subscriptions={subscriptions}
-              initialFilter="quotation"
-              currentRole={currentRole}
-              onUpdateSubscription={handleUpdateSubscription}
-              onCreateFromTemplate={handleCreateFromTemplate}
-            />
-          )}
+              {activeView === 'invoices' && (
+                <InvoicesView
+                  invoices={invoices}
+                  initialFilter={invoiceFilter}
+                  onRegisterPayment={handleRegisterPayment}
+                />
+              )}
 
-          {activeView === 'billing' && (
-            <BillingEngineView
-              subscriptions={subscriptions}
-              invoices={invoices}
-              billedPeriods={billedPeriods}
-              onExecuteBillingRun={handleExecuteBillingRun}
-            />
-          )}
+              {activeView === 'security' && <PaymentSecurityConsentPage />}
 
-          {activeView === 'invoices' && (
-            <InvoicesView
-              invoices={invoices}
-              initialFilter={invoiceFilter}
-              onRegisterPayment={handleRegisterPayment}
-            />
-          )}
+              {activeView === 'risk' && (
+                <RiskProductivityPage onNavigate={(view) => setActiveView(view)} />
+              )}
 
-          {activeView === 'plans' && (
-            <PlansCatalogView
-              plans={plans}
-              products={products}
-              currentRole={currentRole}
-              onAddPlan={handleAddPlan}
-            />
-          )}
+              {activeView === 'ai' && (
+                <AICommandCenterPage
+                  subscriptions={subscriptions}
+                  invoices={invoices}
+                  onNavigate={(view) => setActiveView(view)}
+                />
+              )}
 
-          {activeView === 'discounts' && (
-            <PlansCatalogView
-              plans={plans}
-              products={products}
-              currentRole={currentRole}
-              onAddPlan={handleAddPlan}
-            />
-          )}
+              {activeView === 'recommendations' && (
+                <RecommendationsPage onNavigate={(view) => setActiveView(view)} />
+              )}
 
-          {activeView === 'portal' && (
-            <CustomerPortalView
-              subscriptions={subscriptions}
-              invoices={invoices}
-              onRequestChange={handlePortalRequestChange}
-            />
-          )}
+              {activeView === 'reports' && (
+                <ReportsAnalyticsPage
+                  subscriptions={subscriptions}
+                  invoices={invoices}
+                />
+              )}
 
-          {activeView === 'signup' && <SignupVerificationView />}
+              {activeView === 'settings' && (
+                <SettingsSecurityPage
+                  currentRole={currentRole}
+                  setCurrentRole={setCurrentRole}
+                />
+              )}
+
+              {activeView === 'billing' && (
+                <BillingEngineView
+                  subscriptions={subscriptions}
+                  invoices={invoices}
+                  billedPeriods={billedPeriods}
+                  onExecuteBillingRun={handleExecuteBillingRun}
+                />
+              )}
+
+              {activeView === 'signup' && <SignupVerificationView />}
+            </>
+          )}
         </div>
       </div>
 
