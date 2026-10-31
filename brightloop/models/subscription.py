@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# ==============================================================================
+# Brightloop Subscription Management Engine
+# Lead Contributor: salmasubair400-eng (https://github.com/salmasubair400-eng)
+# Description: Subscription state machine, variant pricing snapshots & idempotency
+# ==============================================================================
 import logging
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
