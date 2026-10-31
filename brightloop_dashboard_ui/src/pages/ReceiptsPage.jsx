@@ -1,4 +1,6 @@
 // ReceiptsPage.jsx - Dedicated Tax Receipt Verification & Printable Receipts Center
+// Lead Contributor: Naureen-s (https://github.com/Naureen-s)
+// Features: Multi-rail payment reconciliation, PCI-DSS tokenization & 18% GST receipts
 import React, { useState, useEffect } from 'react';
 import {
   Receipt,
