@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Theme variables (space separated RGB). The theme picker overwrites these at runtime. */
+  :root {
+    --glow: 34 211 238; --brand: 58 99 221; --brand-hi: 70 110 227; --brand-dark: 46 82 192; --brand-light: 230 238 255;
+    --tint: 150 175 215; --glow-i: 1;
+    --n900: 10 15 26; --n800: 18 26 40; --n700: 27 37 56; --mist: 232 238 248; --fog: 154 167 188;
+    --frost: 241 245 251; --ink: 27 36 51; --ink-soft: 91 101 119; --line: 213 222 236; --paper: 251 232 206;
+    --lite-covered: 52 211 153; --lite-partial: 251 191 36; --lite-missing: 163 174 194; --lite-review: 182 162 255;
+  }
+  body {
+    @apply font-sans text-mist min-h-screen;
+    background-color: #0A0F1A;
+    background-image:
+      radial-gradient(60% 45% at 12% 8%, rgb(var(--tint) / 0.40), transparent 65%),
+      radial-gradient(45% 40% at 95% 95%, rgb(var(--glow) / calc(0.14 * var(--glow-i))), transparent 65%),
+      linear-gradient(160deg, #18212F 0%, #0A0F1A 70%);
+    background-attachment: fixed;
+  }
+  ::selection { background: rgb(var(--glow) / 0.35); }
+}
+
+@layer components {
+  /* Translucent glass panel on the dark background */
+  .glass { @apply bg-white/10 backdrop-blur-xl border border-white/20; }
+  /* Light frosted card: the readable surface for content */
+  .frost { @apply bg-frost/95 text-ink border border-white/70 rounded-card shadow-card; }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  /* Soft cyan halo around the main panel */
+  .glow-edge { box-shadow: 0 0 0 1px rgba(255,255,255,.25), 0 0 calc(46px * var(--glow-i)) rgb(var(--glow) / calc(.22 * var(--glow-i))), 0 30px 60px rgba(0,0,0,.45); }
+  /* Neon glow on key headings (scales with the intensity slider) */
+  .neon-text { text-shadow: 0 0 calc(18px * var(--glow-i)) rgb(var(--glow) / calc(.55 * var(--glow-i))); }
+
+  /* Slider with a blue filled track and a raised round thumb */
+  .neo-range {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 999px; outline: none;
+    background: linear-gradient(90deg, rgb(var(--glow)) var(--pct, 50%), rgba(255,255,255,.22) var(--pct, 50%));
+  }
+  .neo-range::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; border: 0; cursor: pointer;
+    background: linear-gradient(#fff, #DDE5F2); box-shadow: 0 3px 8px rgba(0,0,0,.4); transition: transform .15s;
+  }
+  .neo-range::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%; border: 0; cursor: pointer;
+    background: linear-gradient(#fff, #DDE5F2); box-shadow: 0 3px 8px rgba(0,0,0,.4);
+  }
+  .neo-range::-webkit-slider-thumb:hover { transform: scale(1.12); }
+  .neo-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgb(var(--glow)); }
+  .neo-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px rgb(var(--glow)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* "Reduce effects": no glass blur, no transitions (spinners keep spinning so loading is still visible) */
+html[data-effects='off'] *, html[data-effects='off'] *::before, html[data-effects='off'] *::after {
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important; transition: none !important;
+}
+
+/* ---------- Ticker strip (scrolling feature tags) and typing cursor ---------- */
+.ticker { overflow: hidden; background: rgb(var(--n900) / 0.6); border-bottom: 1px solid rgb(255 255 255 / 0.1); }
+.ticker-track { display: flex; gap: 12px; width: max-content; padding: 8px 0; animation: ticker 50s linear infinite; }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+.ticker-chip { white-space: nowrap; font-size: 0.7rem; letter-spacing: 0.06em; padding: 4px 12px; border: 1px solid rgb(255 255 255 / 0.2); color: rgb(var(--mist)); }
+@keyframes ticker { to { transform: translateX(-50%); } }
+.type-cursor { animation: blink 1s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+.pixel-deco { display: none; }
+html[data-effects='off'] .ticker-track, html[data-effects='off'] .type-cursor { animation: none; }
+html[data-effects='off'] .ticker { overflow-x: auto; }
+
+/* =====================================================================================
+   PIXEL ROBOT LOOK (neo-brutalist terminal): cream paper, navy ink, orange buttons,
+   thick borders and hard offset shadows. Only active when <html data-style="pixel">.
+   ===================================================================================== */
+html[data-style='pixel'] {
+  --n900: 251 232 206; --n800: 255 245 230; --n700: 244 222 190;
+  --mist: 4 22 31; --fog: 66 82 90; --frost: 255 251 244; --ink: 4 22 31; --ink-soft: 58 74 82; --line: 4 22 31;
+  --lite-covered: 20 120 70; --lite-partial: 150 90 0; --lite-missing: 84 96 106; --lite-review: 90 60 190;
+}
+html[data-style='pixel'] body {
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  background-color: rgb(var(--paper));
+  background-image:
+    linear-gradient(rgb(var(--ink) / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--ink) / 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+html[data-style='pixel'] h1, html[data-style='pixel'] h2 { letter-spacing: 0.02em; }
+html[data-style='pixel'] h2 { text-transform: uppercase; }
+html[data-style='pixel'] .text-xs { font-family: 'Space Mono', ui-monospace, monospace; }
+html[data-style='pixel'] .ui-pixel { font-family: 'Silkscreen', 'Space Mono', ui-monospace, monospace; }
+html[data-style='pixel'] .ui-eyebrow { font-family: 'Space Mono', ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.72rem; font-weight: 700; }
+html[data-style='pixel'] input, html[data-style='pixel'] select, html[data-style='pixel'] textarea, html[data-style='pixel'] button { font-family: inherit; }
+
+/* Square everything */
+html[data-style='pixel'] [class~='rounded-full'], html[data-style='pixel'] [class~='rounded-2xl'], html[data-style='pixel'] [class~='rounded-xl'],
+html[data-style='pixel'] [class~='rounded-lg'], html[data-style='pixel'] [class~='rounded-card'],
+html[data-style='pixel'] [class~='rounded-[28px]'], html[data-style='pixel'] [class~='rounded-[32px]'] { border-radius: 0; }
+
+/* Panels: flat paper, 2px ink border, hard shadow */
+html[data-style='pixel'] .frost, html[data-style='pixel'] .glass, html[data-style='pixel'] .glow-edge {
+  background: rgb(var(--frost)); color: rgb(var(--ink)); backdrop-filter: none; -webkit-backdrop-filter: none;
+  border-width: 2px; border-color: rgb(var(--ink));
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 4px 4px 0 rgb(var(--ink));
+}
+html[data-style='pixel'] header { background: rgb(var(--paper)); backdrop-filter: none; border-bottom: 2px solid rgb(var(--ink)); }
+
+/* Translucent "white on dark" helpers become ink tints on paper */
+html[data-style='pixel'] [class~='bg-white/5'] { background-color: rgb(var(--ink) / 0.04); }
+html[data-style='pixel'] [class~='bg-white/10'] { background-color: rgb(var(--ink) / 0.08); }
+html[data-style='pixel'] [class~='bg-white/15'] { background-color: rgb(var(--ink) / 0.14); }
+html[data-style='pixel'] [class~='hover:bg-white/10']:hover, html[data-style='pixel'] [class~='hover:bg-white/20']:hover { background-color: rgb(var(--ink) / 0.14); }
+html[data-style='pixel'] [class~='border-white/10'], html[data-style='pixel'] [class~='border-white/15'],
+html[data-style='pixel'] [class~='border-white/20'], html[data-style='pixel'] [class~='border-white/70'] { border-color: rgb(var(--ink)); }
+html[data-style='pixel'] [class~='text-white'] { color: rgb(var(--ink)); }
+
+/* Shadows */
+html[data-style='pixel'] .shadow-raise, html[data-style='pixel'] .shadow-card, html[data-style='pixel'] .shadow-blue {
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 3px 3px 0 rgb(var(--ink));
+}
+html[data-style='pixel'] .shadow-lift, html[data-style='pixel'] .shadow-neon, html[data-style='pixel'] .hover\:shadow-lift:hover {
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 5px 5px 0 rgb(var(--ink));
+}
+
+/* Gradients become flat colour blocks with ink borders */
+html[data-style='pixel'] [class~='from-white'] { background-image: none; background-color: rgb(var(--frost)); border: 2px solid rgb(var(--ink)); }
+html[data-style='pixel'] [class~='from-brand-hi'] { background-image: none; background-color: rgb(var(--brand)); color: rgb(var(--ink)); border: 2px solid rgb(var(--ink)); }
+
+/* Buttons: press-in effect */
+html[data-style='pixel'] .ui-btn {
+  background-image: none; border: 2px solid rgb(var(--ink)); font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase;
+  box-shadow: 3px 3px 0 rgb(var(--ink)); transition: transform 90ms steps(3), box-shadow 90ms steps(3), background-color 90ms;
+}
+html[data-style='pixel'] .ui-btn-primary { background-color: rgb(var(--brand)); color: rgb(var(--ink)); }
+html[data-style='pixel'] .ui-btn-secondary { background-color: rgb(var(--frost)); color: rgb(var(--ink)); }
+html[data-style='pixel'] .ui-btn-dark { background-color: rgb(var(--ink)); color: rgb(var(--paper)); }
+html[data-style='pixel'] .ui-btn-ghost { background: transparent; border-color: transparent; box-shadow: none; color: rgb(var(--ink)); }
+html[data-style='pixel'] .ui-btn:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 rgb(var(--ink)); }
+html[data-style='pixel'] .ui-btn:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 0 0 0 rgb(var(--ink)); }
+html[data-style='pixel'] .ui-btn-ghost:hover:not(:disabled) { transform: none; box-shadow: none; background-color: rgb(var(--ink) / 0.08); }
+
+/* Fields */
+html[data-style='pixel'] .ui-input { border: 2px solid rgb(var(--ink)); background: #fff; box-shadow: 3px 3px 0 rgb(var(--ink) / 0.25); color: rgb(var(--ink)); }
+
+/* Slider */
+html[data-style='pixel'] .neo-range { height: 10px; border-radius: 0; border: 2px solid rgb(var(--ink)); background: linear-gradient(90deg, rgb(var(--brand)) var(--pct, 50%), #fff var(--pct, 50%)); }
+html[data-style='pixel'] .neo-range::-webkit-slider-thumb { width: 20px; height: 20px; border-radius: 0; border: 2px solid rgb(var(--ink)); background: rgb(var(--brand)); box-shadow: 2px 2px 0 rgb(var(--ink)); }
+html[data-style='pixel'] .neo-range::-moz-range-thumb { width: 16px; height: 16px; border-radius: 0; border: 2px solid rgb(var(--ink)); background: rgb(var(--brand)); box-shadow: 2px 2px 0 rgb(var(--ink)); }
+
+/* Ticker and decoration */
+html[data-style='pixel'] .ticker { background: rgb(var(--ink)); border-bottom: 2px solid rgb(var(--ink)); }
+html[data-style='pixel'] .ticker-chip { color: rgb(var(--paper)); border: 2px solid rgb(var(--paper)); box-shadow: 3px 3px 0 rgb(var(--brand)); font-family: 'Space Mono', ui-monospace, monospace; font-weight: 700; text-transform: uppercase; }
+html[data-style='pixel'] .pixel-deco { display: block; position: absolute; border: 3px solid rgb(var(--ink) / 0.15); pointer-events: none; }
+
+/* Terminal panel: navy with cream text and an orange offset shadow, like the video's simulator */
+html[data-style='pixel'] .ui-terminal {
+  background: rgb(var(--ink)); color: rgb(var(--paper)); border-color: rgb(var(--ink));
+  --mist: 251 232 206; --fog: 150 172 180; --glow: 255 140 40;
+  --lite-covered: 52 211 153; --lite-partial: 251 191 36; --lite-missing: 163 174 194; --lite-review: 182 162 255;
+  box-shadow: 5px 5px 0 rgb(var(--brand));
+}
+html[data-style='pixel'] .ui-terminal [class~='bg-white/10'] { background-color: rgb(var(--paper) / 0.12); }
+html[data-style='pixel'] .ui-terminal [class~='border-white/10'] { border-color: rgb(var(--paper) / 0.25); }
+html[data-style='pixel'] .ui-terminal .ui-btn-dark { background: transparent; color: rgb(var(--paper)); border-color: rgb(var(--paper)); box-shadow: 3px 3px 0 rgb(var(--brand)); }
