@@ -1,4 +1,6 @@
 // RiskProductivityPage.jsx - Risk Intelligence & Measurable Productivity Score
+// Lead Contributor: gowrimarian-jpg (https://github.com/gowrimarian-jpg)
+// Features: 4 Risk categories, Productivity Score 0-100 with 6 weighted metrics, 37.5 hrs/mo saved
 import React from 'react';
 import {
   AlertTriangle,

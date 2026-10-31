@@ -1,4 +1,6 @@
 // AICommandCenterPage.jsx - Fact-Grounded LLM Copilot with Action Confirmation Gates
+// Lead Contributor: gowrimarian-jpg (https://github.com/gowrimarian-jpg)
+// Features: Grounded natural-language billing retrieval, invoice drafting & human gates
 import React, { useState } from 'react';
 import {
   Sparkles,
