@@ -36,9 +36,34 @@ import { applyTheme } from './theme';
 import { Zap, X, ShieldAlert, ArrowRight } from 'lucide-react';
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState(DEMO_PROFILES[0]);
-  const [currentRole, setCurrentRole] = useState('admin'); // 'admin' | 'staff' | 'customer'
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('auth') === '1' || urlParams.get('demo') === '1') return true;
+      return localStorage.getItem('brightloop_authenticated') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('brightloop_current_user');
+      return saved ? JSON.parse(saved) : DEMO_PROFILES[0];
+    } catch (e) {
+      return DEMO_PROFILES[0];
+    }
+  });
+  const [currentRole, setCurrentRole] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const r = urlParams.get('role');
+      if (r) return r;
+      const saved = localStorage.getItem('brightloop_current_user');
+      return saved ? JSON.parse(saved).role : 'admin';
+    } catch (e) {
+      return 'admin';
+    }
+  });
   const [workspace, setWorkspace] = useState('operations'); // 'operations' | 'executive'
   const getInitialView = () => {
     try {
@@ -75,6 +100,10 @@ export default function App() {
     setCurrentUser(profile);
     setCurrentRole(profile.role);
     setIsAuthenticated(true);
+    try {
+      localStorage.setItem('brightloop_authenticated', 'true');
+      localStorage.setItem('brightloop_current_user', JSON.stringify(profile));
+    } catch (e) {}
     if (profile.role === 'customer') {
       setActiveView('subscriptions');
     } else {
@@ -84,7 +113,10 @@ export default function App() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setActiveView('overview');
+    try {
+      localStorage.removeItem('brightloop_authenticated');
+    } catch (e) {}
+    setActiveView('login');
   };
 
   // Data Store State
