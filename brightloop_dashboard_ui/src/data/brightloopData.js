@@ -98,6 +98,86 @@ export const INITIAL_PRODUCTS = [
   },
 ];
 
+export const INITIAL_TAXES = [
+  {
+    id: 'tax_gst_18',
+    name: 'GST 18% (CGST 9% + SGST 9%)',
+    rate: 18,
+    type: 'percent',
+    cgst: 9,
+    sgst: 9,
+    scope: 'services',
+    description: 'Standard Indian GST rate for B2B software and SaaS subscriptions.',
+    active: true,
+  },
+  {
+    id: 'tax_gst_exempt',
+    name: 'GST Exempt (0% - SEZ / Export)',
+    rate: 0,
+    type: 'percent',
+    cgst: 0,
+    sgst: 0,
+    scope: 'export',
+    description: 'Zero-rated supply for Special Economic Zones and international exports under LUT.',
+    active: true,
+  },
+];
+
+export const INITIAL_QUOTE_TEMPLATES = [
+  {
+    id: 'tmpl_standard_crm',
+    name: 'Standard CRM & Seats Package',
+    planId: 'plan_starter_monthly',
+    planName: 'Starter Monthly',
+    paymentTerm: 'Immediate Payment',
+    description: 'Quick start bundle with CRM core, Brand: Odoo variant, and 2 extra team seats.',
+    lines: [
+      {
+        productId: 'prod_crm',
+        productName: 'Brightloop CRM',
+        variant: 'Odoo Brand (+₹560)',
+        qty: 1,
+        unitPrice: 2060, // 1500 + 560
+        taxRate: 18,
+      },
+      {
+        productId: 'prod_seat',
+        productName: 'Extra Seat Add-on',
+        variant: 'Standard',
+        qty: 2,
+        unitPrice: 250,
+        taxRate: 18,
+      },
+    ],
+  },
+  {
+    id: 'tmpl_enterprise_annual',
+    name: 'Enterprise Full Suite Annual',
+    planId: 'plan_business_yearly',
+    planName: 'Business Yearly',
+    paymentTerm: 'Net 15',
+    description: 'Annual corporate enterprise contract with 10 CRM licenses and 24/7 priority support.',
+    lines: [
+      {
+        productId: 'prod_crm',
+        productName: 'Brightloop CRM',
+        variant: 'Standard Brand',
+        qty: 10,
+        unitPrice: 1500,
+        taxRate: 18,
+      },
+      {
+        productId: 'prod_support',
+        productName: 'Priority Support Add-on',
+        variant: 'Standard',
+        qty: 1,
+        unitPrice: 500,
+        taxRate: 18,
+      },
+    ],
+  },
+];
+
 export const INITIAL_DISCOUNTS = [
   {
     id: 'disc_volume_10',
@@ -539,11 +619,11 @@ export const INITIAL_PAYMENTS = [
     methodLabel: 'UPI / Instant QR',
     gateway: 'Razorpay UPI Rail',
     transactionId: 'TXN-9482-UPI-IND',
-    status: 'reconciled', // 'reconciled' | 'pending_webhook' | 'mismatch' | 'refunded'
+    status: 'reconciled',
     tokenVaultRef: 'TOK_upi_948201',
     memo: 'Automated invoice settlement via webhook',
     fees: 0,
-    notes: 'Tokenized transaction settled directly into corporate HDFC account.',
+    notes: 'Tokenized transaction settled directly into corporate account.',
   },
   {
     id: 'pay_002',
@@ -564,7 +644,7 @@ export const INITIAL_PAYMENTS = [
     transactionId: 'TXN-7193-STRIPE-CC',
     status: 'reconciled',
     tokenVaultRef: 'tok_1Ok4G2eFkd928374',
-    memo: 'PCI-DSS Tokenized subscription auto-debit',
+    memo: 'Tokenized subscription auto-debit',
     fees: 295.0,
     notes: 'Card details encrypted and vaulted at gateway level.',
   },
@@ -583,10 +663,10 @@ export const INITIAL_PAYMENTS = [
     paymentTime: '16:48:00 IST',
     method: 'bank',
     methodLabel: 'NEFT Bank Transfer',
-    gateway: 'HDFC Corporate Direct API',
+    gateway: 'Corporate Direct API',
     transactionId: 'NEFT-HDFC-9928174',
     status: 'reconciled',
-    tokenVaultRef: 'BANK_HDFC_VIRTUAL_01',
+    tokenVaultRef: 'BANK_VIRTUAL_01',
     memo: 'Bulk corporate bank wire reconciliation',
     fees: 0,
     notes: 'Virtual account number match verified with zero mismatch.',
@@ -606,9 +686,9 @@ export const INITIAL_PAYMENTS = [
     paymentTime: '19:10:15 IST',
     method: 'upi',
     methodLabel: 'UPI / Instant QR',
-    gateway: 'Razorpay UPI Rail',
+    gateway: 'UPI Rail',
     transactionId: 'TXN-6612-UPI-SUSP',
-    status: 'mismatch', // Flagged for reconciliation
+    status: 'mismatch',
     tokenVaultRef: 'TOK_upi_661290',
     memo: 'UTR received without corresponding invoice memo',
     fees: 0,
@@ -634,8 +714,8 @@ export const INITIAL_RECEIPTS = [
     companyPan: 'AABCB1234C',
     companyAddress: 'Level 4, Orion Business Tower, Bengaluru, KA 560001',
     amountUntaxed: 2560.0,
-    cgstAmount: 230.4, // 9%
-    sgstAmount: 230.4, // 9%
+    cgstAmount: 230.4,
+    sgstAmount: 230.4,
     totalTax: 460.8,
     amountTotal: 3020.8,
     paymentMethod: 'UPI Instant Settlement (Ref: UPI/77882910)',
@@ -698,7 +778,7 @@ export const INITIAL_RECEIPTS = [
     totalTax: 720.0,
     amountTotal: 4720.0,
     paymentMethod: 'Corporate NEFT Virtual Bank Wire',
-    tokenRef: 'BANK_HDFC_VIRTUAL_01',
+    tokenRef: 'BANK_VIRTUAL_01',
     verificationHash: 'SHA256: 91ab2094c8e192f746182901bcae543029174829104719284719028',
     status: 'Verified & Stamped',
     lines: [

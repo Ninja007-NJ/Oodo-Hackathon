@@ -50,7 +50,7 @@ export default function BrightloopHeader({
           <div className="flex items-center gap-2">
             <span className="text-base font-black tracking-tight text-white">BRIGHTLOOP</span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-orange-400 bg-orange-950/80 px-2.5 py-0.5 rounded-full border border-orange-800/80">
-              Odoo 17 Platform
+              Subscription Engine
             </span>
           </div>
           <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
@@ -58,7 +58,7 @@ export default function BrightloopHeader({
             <span>•</span>
             <span className="text-emerald-400 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              PostgreSQL Sync
+              Local State Reactive Store
             </span>
           </div>
         </div>
@@ -91,14 +91,16 @@ export default function BrightloopHeader({
           <span className="text-slate-500 text-[10px]">(&lt;2.0s)</span>
         </div>
 
-        {/* Quick Action: Run Billing Now (Buildly Orange Button) */}
-        <button
-          onClick={onOpenBillingModal}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-orange-500/25 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
-        >
-          <Zap className="w-3.5 h-3.5 fill-current" />
-          <span>⚡ Run Billing</span>
-        </button>
+        {/* Quick Action: Run Billing Now (Buildly Orange Button) - Staff and Admin Only */}
+        {currentRole !== 'customer' && (
+          <button
+            onClick={onOpenBillingModal}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-orange-500/25 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+          >
+            <Zap className="w-3.5 h-3.5 fill-current" />
+            <span>⚡ Run Billing</span>
+          </button>
+        )}
 
         {/* Active Profile Pill with Sign Out */}
         {currentUser && (
